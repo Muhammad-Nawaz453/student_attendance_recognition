@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}View Attendance{% endblock %}
+
+{% block styles %}
+<style>
+    .filter-section {
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filter-section input {
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    .filter-section input:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .no-records {
+        text-align: center;
+        padding: 3rem;
+        color: #718096;
+    }
+
+    .info-box {
+        background: #e6fffa;
+        border: 1px solid #81e6d9;
+        padding: 1rem;
+        border-radius: 5px;
+        margin-bottom: 1rem;
+        color: #234e52;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 1.5rem; color: #667eea;">Attendance Records</h2>
+
+    <div class="info-box">
+        <strong>Current Date:</strong> {{ date }} |
+        <strong>Total Records:</strong> {{ records|length }}
+    </div>
+
+    <div class="filter-section">
+        <label for="date">Select Date:</label>
+        <input type="date" id="date" value="{{ date }}" onchange="changeDate()">
+        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+        <button class="btn btn-primary" onclick="showToday()">Today</button>
+    </div>
+
+    {% if records %}
+    <table>
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Name</th>
+                <th>Class</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record[0] }}</td>
+                <td>{{ record[1] }}</td>
+                <td>{{ record[2] }}</td>
+                <td>{{ record[3] }}</td>
+                <td><span style="color: #48bb78; font-weight: 600;">{{ record[4] }}</span></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="no-records">
+        <p style="font-size: 1.2rem;">📋 No attendance records for {{ date }}</p>
+        <p style="margin-top: 1rem;">Have you marked any attendance today?</p>
+        <a href="{{ url_for('take_attendance') }}" class="btn btn-primary"
+            style="margin-top: 1rem; display: inline-block;">
+            Take Attendance Now
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function changeDate() {
+        const date = document.getElementById('date').value;
+        window.location.href = '{{ url_for("view_attendance") }}?date=' + date;
+    }
+
+    function showToday() {
+        const today = new Date().toISOString().split('T')[0];
+        window.location.href = '{{ url_for("view_attendance") }}?date=' + today;
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block styles %}
+<style>
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card h3 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-card p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+
+    .action-btn {
+        padding: 1.5rem;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        text-align: center;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.3s;
+    }
+
+    .action-btn:hover {
+        border-color: #667eea;
+        transform: translateY(-5px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
+    }
+
+    .action-btn span {
+        display: block;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<h2 style="color: white; margin-bottom: 2rem;">Dashboard</h2>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>{{ total_students }}</h3>
+        <p>Total Students</p>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+        <h3>{{ present_today }}</h3>
+        <p>Present Today</p>
+    </div>
+
+    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <h3>{{ total_students - present_today }}</h3>
+        <p>Absent Today</p>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 1.5rem;">Quick Actions</h3>
+    <div class="quick-actions">
+        <a href="{{ url_for('register_student') }}" class="action-btn">
+            <span>👤</span>
+            <strong>Register Student</strong>
+        </a>
+
+        <a href="{{ url_for('take_attendance') }}" class="action-btn">
+            <span>📸</span>
+            <strong>Take Attendance</strong>
+        </a>
+
+        <a href="{{ url_for('view_attendance') }}" class="action-btn">
+            <span>📊</span>
+            <strong>View Records</strong>
+        </a>
+
+        <a href="{{ url_for('students') }}" class="action-btn">
+            <span>👥</span>
+            <strong>All Students</strong>
+        </a>
+    </div>
+</div>
+{% endblock %}

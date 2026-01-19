@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Take Attendance{% endblock %}
+
+{% block styles %}
+<style>
+    .camera-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .video-wrapper {
+        position: relative;
+        background: #000;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+    }
+
+    #video {
+        width: 100%;
+        display: block;
+    }
+
+    .controls {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+
+    .result {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .result.success {
+        background: #c6f6d5;
+        color: #276749;
+    }
+
+    .result.error {
+        background: #fed7d7;
+        color: #742a2a;
+    }
+
+    #canvas {
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="camera-container">
+    <div class="card">
+        <h2 style="margin-bottom: 1.5rem; color: #667eea;">Take Attendance</h2>
+
+        <div class="video-wrapper">
+            <video id="video" autoplay></video>
+        </div>
+
+        <canvas id="canvas"></canvas>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="captureAndRecognize()">
+                📸 Capture & Mark Attendance
+            </button>
+            <button class="btn btn-danger" onclick="stopCamera()">
+                Stop Camera
+            </button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+</div>
+
+<script>
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const result = document.getElementById('result');
+    let stream = null;
+
+    // Start camera
+    async function startCamera() {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: { width: 640, height: 480 }
+            });
+            video.srcObject = stream;
+        } catch (err) {
+            result.innerHTML = '<div class="result error">Error accessing camera: ' + err.message + '</div>';
+        }
+    }
+
+    function stopCamera() {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            video.srcObject = null;
+        }
+    }
+
+    async function captureAndRecognize() {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0);
+
+        const imageData = canvas.toDataURL('image/jpeg');
+
+        result.innerHTML = '<div class="result">Processing...</div>';
+
+        try {
+            const response = await fetch('/recognize_face', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ image: imageData })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                result.innerHTML = `<div class="result success">✓ ${data.message}</div>`;
+            } else {
+                result.innerHTML = `<div class="result error">✗ ${data.message}</div>`;
+            }
+        } catch (err) {
+            result.innerHTML = '<div class="result error">Error: ' + err.message + '</div>';
+        }
+    }
+
+    // Start camera on load
+    startCamera();
+
+    // Stop camera on page unload
+    window.addEventListener('beforeunload', stopCamera);
+</script>
+{% endblock %}

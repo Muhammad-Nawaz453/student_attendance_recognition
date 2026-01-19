@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Register Student{% endblock %}
+
+{% block styles %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #4a5568;
+        font-weight: 500;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+
+    .image-preview {
+        margin-top: 1rem;
+        text-align: center;
+    }
+
+    .image-preview img {
+        max-width: 300px;
+        border-radius: 10px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="card">
+        <h2 style="margin-bottom: 1.5rem; color: #667eea;">Register New Student</h2>
+
+        {% if success %}
+        <div class="alert alert-success">{{ success }}</div>
+        {% endif %}
+
+        {% if error %}
+        <div class="alert alert-error">{{ error }}</div>
+        {% endif %}
+
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="student_id">Student ID *</label>
+                <input type="text" id="student_id" name="student_id" required>
+            </div>
+
+            <div class="form-group">
+                <label for="name">Full Name *</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email">
+            </div>
+
+            <div class="form-group">
+                <label for="class">Class/Section *</label>
+                <input type="text" id="class" name="class" required>
+            </div>
+
+            <div class="form-group">
+                <label for="image">Upload Photo (Clear face photo) *</label>
+                <input type="file" id="image" name="image" accept="image/*" required onchange="previewImage(event)">
+            </div>
+
+            <div class="image-preview" id="preview"></div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                Register Student
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewImage(event) {
+        const preview = document.getElementById('preview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+{% endblock %}
