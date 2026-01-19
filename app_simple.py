@@ -264,10 +264,11 @@ def recognize_face():
                               'confidence': round(100 - confidence, 2)})
             
             # Mark attendance
-            current_time = datetime.now().time()
+# Mark attendance - convert time to string
+            current_time = datetime.now().strftime('%H:%M:%S')
             c.execute("""INSERT INTO attendance (student_id, date, time, status)
                         VALUES (?, ?, ?, 'Present')""",
-                     (student_id, today, current_time))
+                    (student_id, today, current_time))
             conn.commit()
             conn.close()
             
